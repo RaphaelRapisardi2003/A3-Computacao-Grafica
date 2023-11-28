@@ -20,12 +20,12 @@ public class Cena implements GLEventListener {
     public int iter_telas = 0;
 
     // atributos dos quads
-    public QuadradoSprite q1, q3, q6, btn1, btn2, cor;
+    public QuadradoSprite q1, q3, q6, q7, btn1, btn2, cor;
     public BolinhaSprite b1;
     public Jogador jogador;
     public Bolinha bolinha;
     public Background background;
-    public Obstaculo obstaculo;
+    public Obstaculo obstaculo, obstaculo2;
     public boolean mouseHabilitado = false;
     public float mouseX=0;
     public float mouseY=0;
@@ -38,9 +38,9 @@ public class Cena implements GLEventListener {
     public static final String FACE2 = "imagens/palosInterrogacao1-1.png";
     public static final String FACE1 = "imagens/brick.jpg";
     public static final String FACE3 = "imagens/background.png";
-    public static final String FACE4 = "imagens/ferreira1-1.png";
+    //public static final String FACE4 = "imagens/ferreira1-1.png";
     public static final String FACE5 = "imagens/bolinha2.png";
-    public static final String FACE6 = "imagens/palosInterrogacao1-1.png";
+    //public static final String FACE6 = "imagens/palosInterrogacao1-1.png";
     public static final String FACEBTN1 = "imagens/rosa-claro.jpg";
     public static final String FACECOR = "imagens/coracao.png";
 
@@ -71,7 +71,8 @@ public class Cena implements GLEventListener {
         q1 = new QuadradoSprite(1,filtro,wrap,modo,limite,tamq1,corq1,FACE1,false); // barra
         b1 = new BolinhaSprite(1,filtro,wrap,modo, limite,tamb1,tamb1[0],corq1,FACE5,false); // bolinha
         q3 = new QuadradoSprite(1,filtro,wrap,modo,limite,tamq3,corq1,FACE3,false); // background
-        q6 = new QuadradoSprite(1,filtro,wrap,modo,limite,tamq6,corq1,FACE6,false); // obstáculo
+        q6 = new QuadradoSprite(1,filtro,wrap,modo,limite,tamq6,corq1,FACE1,false); // obstáculo
+        q7 = new QuadradoSprite(1,filtro,wrap,modo,limite,tamq6,corq1,FACE1,false); // obstáculo
 
         btn1 = new BotaoSprite(1,filtro,wrap,modo,limite,tambtn1,corq1,FACEBTN1,false);
         btn2 = new BotaoSprite(1,filtro,wrap,modo,limite,tambtn1,corq1,FACEBTN1,false);
@@ -90,6 +91,11 @@ public class Cena implements GLEventListener {
         q6.setPosx(0);
         q6.setPosy(20);
 
+        // configurando q7 (obstáculo 2)
+        q7.setVelx(1);
+        q7.setPosx(20);
+        q7.setPosy(50);
+
         // configurando b1 (bolinha)
         b1.setVelx(2);
         b1.setVely(2);
@@ -99,6 +105,7 @@ public class Cena implements GLEventListener {
         bolinha = new Bolinha(b1,FACE5);
         background = new Background(q3,FACE3);
         obstaculo = new Obstaculo(q6,FACE1);
+        obstaculo2 = new Obstaculo(q7,FACE1);
 
         // configurando btn 1
         btn1.setPosx(0);
@@ -184,7 +191,7 @@ public class Cena implements GLEventListener {
         gl.glFlush();
     }
 
-    public void menu(GLAutoDrawable drawable){ // TODO fazer mouse bunitin
+    public void menu(GLAutoDrawable drawable){ // TODO fazer menu bunitin
         gl = drawable.getGL().getGL2();
 
 
@@ -365,7 +372,8 @@ public class Cena implements GLEventListener {
         gl.glColor3f(1,1,1);
         desenhaTexto(gl,(int)mouseX,(int)(mouseY+5),"mouse X: "+mouseX,18);
         desenhaTexto(gl,(int)mouseX,(int)(mouseY),"mouse Y: "+mouseY,18);
-        desenhaTexto(gl,0,90,"FASE: "+jogador.getFase());
+        desenhaTexto(gl,0,90,"FASE: "+jogador.getFase(),24);
+        desenhaTexto(gl,0,80,"PONTOS: "+jogador.getPontos(),18);
 
         gl.glFlush();
 
@@ -452,13 +460,15 @@ public class Cena implements GLEventListener {
 
         }
 
+        // textos na tela
         gl.glColor3f(1, 0, 0);
-        desenhaTexto(gl, 0, 90, "Pontos: " + pontos);
-        desenhaTexto(gl,0,90,"FASE: "+jogador.getFase());
+        desenhaTexto(gl,0,90,"FASE: "+jogador.getFase(),24);
+        desenhaTexto(gl,0,80,"PONTOS: "+jogador.getPontos(),18);
 
         gl.glFlush();
 
-        if (jogador.getPontos() >= 200){
+        // check da situação do jogador
+        if (jogador.getPontos() >= 150){
             iter_telas = 7;
         }
     }
@@ -475,22 +485,31 @@ public class Cena implements GLEventListener {
         // desenhar tudo
         jogador.getObjSprite().desenhar(gl);
         bolinha.getObjSprite().desenhar(gl);
-        q3.desenhar(gl);
+        background.getObjSprite().desenhar(gl);
+
+        obstaculo2.getObjSprite().desenhar(gl);
 
         // movimentar tudo q precisa
 
-        if (!jogador.isPausado()){// TODO adicionar uma classe para manipular eventos do jogo (colisão, pontos, etc)
+        if (!jogador.isPausado()){
 
             // movimentação q2
             colisaoBolinhaBordas(bolinha.getObjSprite() ); // detectando colisões
             colisaoBolinhaBarra(bolinha.getObjSprite(),jogador.getObjSprite());
-            //colisaoBolinhaQ6(bolinha.getObjSprite());
+            colisaoBolinhaObstaculo(bolinha.getObjSprite(),obstaculo2.getObjSprite());
+
             if (bolinha.getObjSprite().isMovendo()) bolinha.getObjSprite().mover(); // chamando o método de movimento
 
+            // texto
             gl.glColor4f(1.0f, 1.0f, 1.0f, bolinha.getObjSprite().getAlfa());
             desenhaTexto(gl, (int) (bolinha.getObjSprite().getIntervaloEsquerda()[0][0]),
                     (int) bolinha.getObjSprite().getIntervaloCima()[1][1] + 10,
                     "alfa q2: " + bolinha.getObjSprite().getAlfa());
+
+            // movimentação obstáculo 2
+            colisaoObstaculoBordas(obstaculo2.getObjSprite());
+
+            obstaculo2.getObjSprite().mover();
 
             // movimentação q1
             if (jogador.getObjSprite().isMovendo()) {
@@ -595,10 +614,14 @@ public class Cena implements GLEventListener {
         desenhaTexto(gl,-90,-20,"q2 colidiu esquerda: "+colisaoQ2esquerda);
 
         // definindo interação caso às condições sejam atendidas
-        if (colisaoQ2cima || colisaoQ2baixo){bolinha.setVely(bolinha.getVely()*-1);}
+        if (colisaoQ2cima){bolinha.setVely(bolinha.getVely()*-1);}
         if (colisaoQ2direita || colisaoQ2esquerda){bolinha.setVelx(bolinha.getVelx()*-1);}
-        if (colisaoQ2baixo){
-            pontos = (pontos <= 0 ) ? 0 : pontos -5;
+        if (colisaoQ2baixo){ // TODO substituir por função resetarBolinha() futuramente
+            jogador.perderPontos(50);
+            jogador.perderVida(1);
+            bolinha.setVely(bolinha.getVely()*-1);
+            bolinha.setPosx(0);
+            bolinha.setPosy(0);
         }
     }
 
@@ -628,6 +651,34 @@ public class Cena implements GLEventListener {
         if (colisaoQ1direita && barra.getVelx() == 1) barra.setVelx(0);
         if (colisaoQ1esquerda && barra.getVelx() == -1) barra.setVelx(0);
     }
+
+    public void colisaoObstaculoBordas(QuadradoSprite obstaculo){
+        // definindo as bordas que interagirão com o quadrado q2
+        float[][][] bordas = {
+                {{100, 100}, {-100, 100}}, // bordas direita ((x0-x1), (y0-y1))
+                {{-100, -100}, {-100, 100}} // bordas esquerda ((x0-x1), (y0-y1))
+
+        };
+
+        // criando vars de controle que receberão a resposta do teste de colisão
+        boolean colisaoQ1direita, colisaoQ1esquerda;
+
+        // obtendo resposta se houve colisão ou não
+        colisaoQ1direita = obstaculo.isColiding(bordas[0][0], bordas[0][1]);
+        colisaoQ1esquerda = obstaculo.isColiding(bordas[1][0], bordas[1][1]);
+
+        //feedback
+        desenhaTexto(gl, (int) obstaculo.getIntervaloBaixo()[0][0],
+                (int) (obstaculo.getIntervaloBaixo()[1][0]-5),"q1 colidiu direita: "+colisaoQ1direita,18);
+
+        desenhaTexto(gl, (int) obstaculo.getIntervaloBaixo()[0][0],
+                (int) (obstaculo.getIntervaloBaixo()[1][0]-10),"q1 colidiu esquerda: "+colisaoQ1esquerda,18);
+
+        // definindo interação caso às condições sejam atendidas
+        if (colisaoQ1direita && obstaculo.getVelx() == 1) obstaculo.setVelx(-1);
+        if (colisaoQ1esquerda && obstaculo.getVelx() == -1) obstaculo.setVelx(1);
+    }
+
 
     public void colisaoBolinhaBarra(QuadradoSprite bolinha, QuadradoSprite barra){
 

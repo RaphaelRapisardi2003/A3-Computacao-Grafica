@@ -30,26 +30,7 @@ public class Mouse implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-//        if (cena.mouseHabilitado) {
-//            System.out.println("mouse X: "+(float)((e.getX()/5)-100)+" | mouse Y: "+(float)((e.getY()/5)-100));
-//            // obtendo valores tratados de x e y do clique na tela
-//            cena.mouseX = (float)((e.getX()/5)-100);
-//            cena.mouseY = (float)((e.getY()/5)-100)*-1;
-//
-//            if (cena.mouseX > cena.jogador.getObjSprite().getIntervaloDireita()[0][0]) { // alterna a movimentação da bola palos
-//                cena.jogador.getObjSprite().setMovendo(true);
-//                cena.jogador.getObjSprite().setDirecao(Direcao.DIREITA);
-//            }
-//            if (cena.mouseX < cena.jogador.getObjSprite().getIntervaloEsquerda()[0][1]) { // alterna a movimentação da bola palos
-//                cena.jogador.getObjSprite().setMovendo(true);
-//                cena.jogador.getObjSprite().setDirecao(Direcao.ESQUERDA);
-//            }
-//            if ((float)((e.getX()/5)-100) >= cena.jogador.getObjSprite().getIntervaloDireita()[0][0] &&
-//                    e.getX() <= cena.jogador.getObjSprite().getIntervaloEsquerda()[0][1]) {
-//                cena.jogador.getObjSprite().setMovendo(false);
-//            }
-//        }
-//
+
     }
 
     @Override
@@ -63,23 +44,25 @@ public class Mouse implements MouseListener {
         cena.mouseX = (float)((e.getX()/5)-100);
         cena.mouseY = (float)((e.getY()/5)-100)*-1;
 
-            //System.out.println("mouse X: "+(float)((e.getX()/5)-100)+" | mouse Y: "+(float)e.getY());
+            if(!cena.jogador.isPausado()){
+                //mouse pra direita
+                if ((float)((e.getX()/5)-100) > cena.jogador.getObjSprite().getIntervaloDireita()[0][0]) {
+                    cena.jogador.getObjSprite().setMovendo(true);
+                    cena.jogador.getObjSprite().setDirecao(Direcao.DIREITA);
+                }
+                // mouse pra esquerda
+                if ((float)((e.getX()/5)-100) < cena.jogador.getObjSprite().getIntervaloEsquerda()[0][1]) {
+                    cena.jogador.getObjSprite().setMovendo(true);
+                    cena.jogador.getObjSprite().setDirecao(Direcao.ESQUERDA);
+                }
+                // mouse em cima da barra
+                if ((float)((e.getX()/5)-100) >= cena.jogador.getObjSprite().getIntervaloDireita()[0][0] &&
+                        e.getX() <= cena.jogador.getObjSprite().getIntervaloEsquerda()[0][1]) {
+                    cena.jogador.getObjSprite().setMovendo(false);
+                }
+            }
 
-            //mouse pra direita
-            if ((float)((e.getX()/5)-100) > cena.jogador.getObjSprite().getIntervaloDireita()[0][0]) {
-                cena.jogador.getObjSprite().setMovendo(true);
-                cena.jogador.getObjSprite().setDirecao(Direcao.DIREITA);
-            }
-            // mouse pra esquerda
-            if ((float)((e.getX()/5)-100) < cena.jogador.getObjSprite().getIntervaloEsquerda()[0][1]) {
-                cena.jogador.getObjSprite().setMovendo(true);
-                cena.jogador.getObjSprite().setDirecao(Direcao.ESQUERDA);
-            }
-            // mouse em cima da barra
-            if ((float)((e.getX()/5)-100) >= cena.jogador.getObjSprite().getIntervaloDireita()[0][0] &&
-                    e.getX() <= cena.jogador.getObjSprite().getIntervaloEsquerda()[0][1]) {
-                cena.jogador.getObjSprite().setMovendo(false);
-            }
+
         }
     }
 
